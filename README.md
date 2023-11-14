@@ -33,13 +33,14 @@ require_relative livepeer
 
 
 lpClient = Livepeer::SDK.new
+
 lpClient.config_security(
   security=Shared::Security.new(
     api_key="",
   )
 )
 
-
+# retrieve all streams
 res = lpClient.stream.get_all()
 
 if ! res.data.nil?
