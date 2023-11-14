@@ -1,0 +1,13 @@
+# VideoSpec
+
+Video metadata
+
+
+## Fields
+
+| Field                                                                                  | Type                                                                                   | Required                                                                               | Description                                                                            | Example                                                                                |
+| -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `format`                                                                               | *T.nilable(String)*                                                                    | :heavy_minus_sign:                                                                     | Format of the asset                                                                    | mp4                                                                                    |
+| `duration`                                                                             | *T.nilable(Float)*                                                                     | :heavy_minus_sign:                                                                     | Duration of the asset in seconds (float)                                               | 23.8328                                                                                |
+| `bitrate`                                                                              | *T.nilable(Float)*                                                                     | :heavy_minus_sign:                                                                     | Bitrate of the video in bits per second                                                | 1000000                                                                                |
+| `tracks`                                                                               | T::Array<[Shared::Tracks](../../models/shared/tracks.md)>                              | :heavy_minus_sign:                                                                     | List of tracks associated with the asset when the format<br/>contemplates them (e.g. mp4)<br/> |                                                                                        |

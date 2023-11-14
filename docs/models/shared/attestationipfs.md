@@ -1,0 +1,11 @@
+# AttestationIpfs
+
+
+## Fields
+
+| Field                                                              | Type                                                               | Required                                                           | Description                                                        | Example                                                            |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------ | ------------------------------------------------------------------ | ------------------------------------------------------------------ | ------------------------------------------------------------------ |
+| `cid`                                                              | *T.nilable(String)*                                                | :heavy_minus_sign:                                                 | CID of the file on IPFS                                            | bafybeihoqtemwitqajy6d654tmghqqvxmzgblddj2egst6yilplr5num6u        |
+| `url`                                                              | *T.nilable(String)*                                                | :heavy_minus_sign:                                                 | URL with IPFS scheme for the file                                  | ipfs://bafybeihoqtemwitqajy6d654tmghqqvxmzgblddj2egst6yilplr5num6u |
+| `gateway_url`                                                      | *T.nilable(String)*                                                | :heavy_minus_sign:                                                 | URL to access file via HTTP through an IPFS gateway                | https://ipfs.io                                                    |
+| `updated_at`                                                       | *T.nilable(Float)*                                                 | :heavy_minus_sign:                                                 | Timestamp (in milliseconds) at which IPFS export task was updated<br/> | 1587667174725                                                      |

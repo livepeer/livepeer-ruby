@@ -1,0 +1,9 @@
+# UpdateSigningKeyRequest
+
+
+## Fields
+
+| Field                                                                                             | Type                                                                                              | Required                                                                                          | Description                                                                                       |
+| ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `key_id`                                                                                          | *String*                                                                                          | :heavy_check_mark:                                                                                | ID of the signing key                                                                             |
+| `request_body`                                                                                    | [Operations::UpdateSigningKeyRequestBody](../../models/operations/updatesigningkeyrequestbody.md) | :heavy_check_mark:                                                                                | N/A                                                                                               |

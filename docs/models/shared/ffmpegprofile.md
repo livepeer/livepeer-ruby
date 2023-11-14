@@ -1,0 +1,18 @@
+# FfmpegProfile
+
+LMPS ffmpeg profile
+
+
+## Fields
+
+| Field                                                        | Type                                                         | Required                                                     | Description                                                  | Example                                                      |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| `width`                                                      | *Integer*                                                    | :heavy_check_mark:                                           | N/A                                                          | 1280                                                         |
+| `name`                                                       | *String*                                                     | :heavy_check_mark:                                           | N/A                                                          | 720p                                                         |
+| `height`                                                     | *Integer*                                                    | :heavy_check_mark:                                           | N/A                                                          | 720                                                          |
+| `bitrate`                                                    | *Integer*                                                    | :heavy_check_mark:                                           | N/A                                                          | 4000                                                         |
+| `fps`                                                        | *Integer*                                                    | :heavy_check_mark:                                           | N/A                                                          | 30                                                           |
+| `fps_den`                                                    | *T.nilable(Integer)*                                         | :heavy_minus_sign:                                           | N/A                                                          | 1                                                            |
+| `gop`                                                        | *T.nilable(String)*                                          | :heavy_minus_sign:                                           | N/A                                                          | 60                                                           |
+| `profile`                                                    | [T.nilable(Shared::Profile)](../../models/shared/profile.md) | :heavy_minus_sign:                                           | N/A                                                          | H264High                                                     |
+| `encoder`                                                    | [T.nilable(Shared::Encoder)](../../models/shared/encoder.md) | :heavy_minus_sign:                                           | N/A                                                          | h264                                                         |

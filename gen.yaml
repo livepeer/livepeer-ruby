@@ -1,0 +1,32 @@
+configVersion: 1.0.0
+generation:
+  comments: {}
+  sdkClassName: SDK
+  maintainOpenAPIOrder: true
+  usageSnippets:
+    optionalPropertyRendering: withExample
+features:
+  ruby:
+    core: 3.0.2
+    flattening: 2.81.1
+    globalSecurity: 2.81.1
+    globalServerURLs: 2.82.0
+    inputOutputModels: 2.82.0
+    nameOverrides: 2.81.1
+ruby:
+  version: 0.0.1
+  author: Livepeer
+  description: Ruby library for the Livepeer API.
+  imports:
+    option: openapi
+    paths:
+      callbacks: models/callbacks
+      errors: models/errors
+      operations: models/operations
+      shared: models/shared
+      webhooks: models/webhooks
+  inputModelSuffix: input
+  maxMethodParams: 4
+  module: Livepeer
+  outputModelSuffix: output
+  packageName: livepeer
