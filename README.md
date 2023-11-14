@@ -8,12 +8,25 @@ For full documentation and examples, please visit [docs.livepeer.org](https://do
 
 ## Installation
 
+Install the library:
+
 ```bash
 gem install livepeer
-gem livepeer
 ```
 
+If you want to build the gem from source:
+
+```bash
+gem build livepeer.gemspec
+```
+
+### Requirements
+
+- Ruby: = 3.0
+
 ## Usage
+
+The library needs to be configured with your Livepeer Studio account's API key, which is available in the [Studio Dashboard](httpss://livepeer.studio)
 
 ```ruby
 require_relative livepeer
