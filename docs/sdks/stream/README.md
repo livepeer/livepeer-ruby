@@ -8,8 +8,11 @@
 * [delete](#delete) - Delete a stream
 * [get](#get) - Retrieve a stream
 * [update](#update) - Update a stream
+* [terminate](#terminate) - Terminates a live stream
 * [create_clip](#create_clip) - Create a clip
 * [get_all_clips](#get_all_clips) - Retrieve clips of a livestream
+* [create_multistream_target](#create_multistream_target) - Add a multistream target
+* [delete_multistream_target](#delete_multistream_target) - Remove a multistream target
 
 ## get_all
 
@@ -37,7 +40,7 @@ req = Operations::GetStreamsRequest.new(
     
 res = s.stream.get_all(req)
 
-if ! res.data.nil?
+if ! res.classes.nil?
   # handle response
 end
 
@@ -45,9 +48,9 @@ end
 
 ### Parameters
 
-| Parameter                                                                                          | Type                                                                                               | Required                                                                                           | Description                                                                                        |
-| -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| `streamsonly`                                                                                      | *String*                                                                                           | :heavy_minus_sign:                                                                                 | Filter the API response and retrieve a specific subset of stream objects based on certain criteria |
+| Parameter          | Type               | Required           | Description        |
+| ------------------ | ------------------ | ------------------ | ------------------ |
+| `streamsonly`      | *String*           | :heavy_minus_sign: | N/A                |
 
 
 ### Response
@@ -57,7 +60,20 @@ end
 
 ## create
 
-Create a stream
+The only parameter you are required to set is the name of your stream,
+but we also highly recommend that you define transcoding profiles
+parameter that suits your specific broadcasting configuration.
+\
+\
+If you do not define transcoding rendition profiles when creating the
+stream, a default set of profiles will be used. These profiles include
+240p,  360p, 480p and 720p.
+\
+\
+The playback policy is set to public by default for new streams. It can
+also be added upon the creation of a new stream by adding
+`"playbackPolicy": {"type": "jwt"}`
+
 
 ### Example Usage
 
@@ -79,28 +95,29 @@ req = Shared::NewStreamPayload.new(
     creator_id="string",
     playback_policy=Shared::PlaybackPolicy.new(
       type=Shared::Type::JWT,
-      webhook_id="3e02c844-d364-4d48-b401-24b2773b5d6c",
+      webhook_id="string",
       webhook_context=.new{
         "bluetooth": "string",
       },
     ),
     profiles=.new[
       Shared::FfmpegProfile.new(
-        width=1280,
+        width=859213,
         name="720p",
-        height=720,
-        bitrate=4000,
-        fps=30,
-        fps_den=1,
-        gop="60",
-        profile=Shared::Profile::H264_HIGH,
-        encoder=Shared::Encoder::H264,
+        height=417458,
+        bitrate=288408,
+        fps=134365,
+        fps_den=786546,
+        quality=69025,
+        gop="string",
+        profile=Shared::Profile::H264_CONSTRAINED_HIGH,
+        encoder=Shared::Encoder::VP9,
       ),
     ],
     record=false,
     multistream=Shared::Multistream.new(
       targets=.new[
-        Shared::Targets.new(
+        Shared::Target.new(
           profile="720p",
           video_only=false,
           id="<ID>",
@@ -116,7 +133,7 @@ req = Shared::NewStreamPayload.new(
     
 res = s.stream.create(req)
 
-if ! res.data.nil?
+if ! res.classes.nil?
   # handle response
 end
 
@@ -136,7 +153,12 @@ end
 
 ## delete
 
-Delete a stream
+
+This will also suspend any active stream sessions, so make sure to wait
+until the stream has finished. To explicitly interrupt an active
+session, consider instead updating the suspended field in the stream
+using the PATCH stream API.
+
 
 ### Example Usage
 
@@ -249,7 +271,7 @@ req = Operations::UpdateStreamRequest.new(
       suspended=false,
       multistream=Shared::Multistream.new(
         targets=.new[
-          Shared::Targets.new(
+          Shared::Target.new(
             profile="720p",
             video_only=false,
             id="<ID>",
@@ -262,11 +284,25 @@ req = Operations::UpdateStreamRequest.new(
       ),
       playback_policy=Shared::PlaybackPolicy.new(
         type=Shared::Type::WEBHOOK,
-        webhook_id="3e02c844-d364-4d48-b401-24b2773b5d6c",
+        webhook_id="string",
         webhook_context=.new{
           "New": "string",
         },
       ),
+      profiles=.new[
+        Shared::FfmpegProfile.new(
+          width=344620,
+          name="720p",
+          height=708455,
+          bitrate=991464,
+          fps=270324,
+          fps_den=627690,
+          quality=684199,
+          gop="string",
+          profile=Shared::Profile::H264_MAIN,
+          encoder=Shared::Encoder::HEVC,
+        ),
+      ],
     ),
   ),
   stream_patch_payload=Shared::StreamPatchPayload.new(
@@ -275,7 +311,7 @@ req = Operations::UpdateStreamRequest.new(
     suspended=false,
     multistream=Shared::Multistream.new(
       targets=.new[
-        Shared::Targets.new(
+        Shared::Target.new(
           profile="720p",
           video_only=false,
           id="<ID>",
@@ -287,12 +323,26 @@ req = Operations::UpdateStreamRequest.new(
       ],
     ),
     playback_policy=Shared::PlaybackPolicy.new(
-      type=Shared::Type::JWT,
-      webhook_id="3e02c844-d364-4d48-b401-24b2773b5d6c",
+      type=Shared::Type::WEBHOOK,
+      webhook_id="string",
       webhook_context=.new{
-        "male": "string",
+        "Arizona": "string",
       },
     ),
+    profiles=.new[
+      Shared::FfmpegProfile.new(
+        width=278281,
+        name="720p",
+        height=896501,
+        bitrate=499557,
+        fps=446863,
+        fps_den=369182,
+        quality=311507,
+        gop="string",
+        profile=Shared::Profile::H264_CONSTRAINED_HIGH,
+        encoder=Shared::Encoder::H264,
+      ),
+    ],
   ),
 )
     
@@ -317,10 +367,61 @@ end
 **[T.nilable(Operations::UpdateStreamResponse)](../../models/operations/updatestreamresponse.md)**
 
 
+## terminate
+
+`DELETE /stream/{id}/terminate` can be used to terminate an ongoing
+session on a live stream. Unlike suspending the stream, it allows the
+streamer to restart streaming even immediately, but it will force
+terminate the current session and stop the recording.
+\
+\
+A 204 No Content status response indicates the stream was successfully
+terminated.
+
+
+### Example Usage
+
+```ruby
+require_relative livepeer
+
+
+s = Livepeer::SDK.new
+s.config_security(
+  security=Shared::Security.new(
+    api_key="",
+  )
+)
+
+   
+req = Operations::TerminateStreamRequest.new(
+  path_params=Operations::TerminateStreamRequest.new(
+    id="<ID>",
+  ),
+)
+    
+res = s.stream.terminate(req)
+
+if res.status == 200
+  # handle response
+end
+
+```
+
+### Parameters
+
+| Parameter          | Type               | Required           | Description        |
+| ------------------ | ------------------ | ------------------ | ------------------ |
+| `id`               | *String*           | :heavy_check_mark: | ID of the stream   |
+
+
+### Response
+
+**[T.nilable(Operations::TerminateStreamResponse)](../../models/operations/terminatestreamresponse.md)**
+
+
 ## create_clip
 
-Create a clip from a livestream
-
+Create a clip
 
 ### Example Usage
 
@@ -348,7 +449,7 @@ req = Shared::ClipPayload.new(
     
 res = s.stream.create_clip(req)
 
-if ! res.data.nil?
+if ! res.object.nil?
   # handle response
 end
 
@@ -392,7 +493,7 @@ req = Operations::GetStreamIdClipsRequest.new(
     
 res = s.stream.get_all_clips(req)
 
-if ! res.data.nil?
+if ! res.classes.nil?
   # handle response
 end
 
@@ -408,4 +509,113 @@ end
 ### Response
 
 **[T.nilable(Operations::GetStreamIdClipsResponse)](../../models/operations/getstreamidclipsresponse.md)**
+
+
+## create_multistream_target
+
+Add a multistream target
+
+### Example Usage
+
+```ruby
+require_relative livepeer
+
+
+s = Livepeer::SDK.new
+s.config_security(
+  security=Shared::Security.new(
+    api_key="",
+  )
+)
+
+   
+req = Operations::AddMultistreamTargetRequest.new(
+  path_params=Operations::AddMultistreamTargetRequest.new(
+    id="<ID>",
+    target_add_payload=Shared::TargetAddPayload.new(
+      profile="720p",
+      video_only=false,
+      id="<ID>",
+      spec=Shared::TargetAddPayloadSpec.new(
+        name="string",
+        url="rtmps://live.my-service.tv/channel/secretKey",
+      ),
+    ),
+  ),
+  target_add_payload=Shared::TargetAddPayload.new(
+    profile="720p",
+    video_only=false,
+    id="<ID>",
+    spec=Shared::TargetAddPayloadSpec.new(
+      name="string",
+      url="rtmps://live.my-service.tv/channel/secretKey",
+    ),
+  ),
+)
+    
+res = s.stream.create_multistream_target(req)
+
+if res.status == 200
+  # handle response
+end
+
+```
+
+### Parameters
+
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `id`                                                                | *String*                                                            | :heavy_check_mark:                                                  | ID of the parent stream                                             |
+| `target_add_payload`                                                | [Shared::TargetAddPayload](../../models/shared/targetaddpayload.md) | :heavy_check_mark:                                                  | N/A                                                                 |
+
+
+### Response
+
+**[T.nilable(Operations::AddMultistreamTargetResponse)](../../models/operations/addmultistreamtargetresponse.md)**
+
+
+## delete_multistream_target
+
+Remove a multistream target
+
+### Example Usage
+
+```ruby
+require_relative livepeer
+
+
+s = Livepeer::SDK.new
+s.config_security(
+  security=Shared::Security.new(
+    api_key="",
+  )
+)
+
+   
+req = Operations::RemoveMultistreamTargetRequest.new(
+  path_params=Operations::RemoveMultistreamTargetRequest.new(
+    id="<ID>",
+    target_id="string",
+  ),
+)
+    
+res = s.stream.delete_multistream_target(req)
+
+if res.status == 200
+  # handle response
+end
+
+```
+
+### Parameters
+
+| Parameter                    | Type                         | Required                     | Description                  |
+| ---------------------------- | ---------------------------- | ---------------------------- | ---------------------------- |
+| `id`                         | *String*                     | :heavy_check_mark:           | ID of the parent stream      |
+| `target_id`                  | *String*                     | :heavy_check_mark:           | ID of the multistream target |
+
+
+### Response
+
+**[T.nilable(Operations::RemoveMultistreamTargetResponse)](../../models/operations/removemultistreamtargetresponse.md)**
 

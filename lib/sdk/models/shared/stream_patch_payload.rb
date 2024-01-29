@@ -20,6 +20,8 @@ module Livepeer
       field :multistream, T.nilable(Shared::Multistream), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('multistream') } }
       # Whether the playback policy for a asset or stream is public or signed
       field :playback_policy, T.nilable(Shared::PlaybackPolicy), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('playbackPolicy') } }
+
+      field :profiles, T.nilable(T::Array[Shared::FfmpegProfile]), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('profiles') } }
       # Should this stream be recorded? Uses default settings. For more
       # customization, create and configure an object store.
       # 
@@ -28,11 +30,12 @@ module Livepeer
       field :suspended, T.nilable(T::Boolean), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('suspended') } }
 
 
-      sig { params(creator_id: T.nilable(Object), multistream: T.nilable(Shared::Multistream), playback_policy: T.nilable(Shared::PlaybackPolicy), record: T.nilable(T::Boolean), suspended: T.nilable(T::Boolean)).void }
-      def initialize(creator_id: nil, multistream: nil, playback_policy: nil, record: nil, suspended: nil)
+      sig { params(creator_id: T.nilable(Object), multistream: T.nilable(Shared::Multistream), playback_policy: T.nilable(Shared::PlaybackPolicy), profiles: T.nilable(T::Array[Shared::FfmpegProfile]), record: T.nilable(T::Boolean), suspended: T.nilable(T::Boolean)).void }
+      def initialize(creator_id: nil, multistream: nil, playback_policy: nil, profiles: nil, record: nil, suspended: nil)
         @creator_id = creator_id
         @multistream = multistream
         @playback_policy = playback_policy
+        @profiles = profiles
         @record = record
         @suspended = suspended
       end

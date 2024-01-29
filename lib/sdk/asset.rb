@@ -40,7 +40,7 @@ module Livepeer
       if r.status == 200
         if Utils.match_content_type(content_type, 'application/json')
           out = Utils.unmarshal_complex(r.env.response_body, T::Array[Shared::Asset])
-          res.data = out
+          res.classes = out
         end
       end
       res
@@ -49,6 +49,78 @@ module Livepeer
     sig { params(request: Shared::NewAssetPayload).returns(Utils::FieldAugmented) }
     def create(request)
       # create - Upload an asset
+      # To upload an asset, your first need to request for a direct upload URL
+      # and only then actually upload the contents of the asset.
+      # \
+      # \
+      # Once you created a upload link, you have 2 options, resumable or direct
+      # upload. For a more reliable experience, you should use resumable uploads
+      # which will work better for users with unreliable or slow network
+      # connections. If you want a simpler implementation though, you should
+      # just use a direct upload.
+      # 
+      # 
+      # ## Direct Upload
+      # For a direct upload, make a PUT request to the URL received in the url
+      # field of the response above, with the raw video file as the request
+      # body. response above:
+      # 
+      # 
+      # ## Resumable Upload
+      # Livepeer supports resumable uploads via Tus. This section provides a
+      # simple example of how to use tus-js-client to upload a video file.
+      # \
+      # \
+      # From the previous section, we generated a URL to upload a video file to
+      # Livepeer on POST /api/asset/request-upload. You should use the
+      # tusEndpoint field of the response to upload the video file and track the
+      # progress:
+      # 
+      # ``` 
+      # # This assumes there is an `input` element of `type="file"` with id
+      # `fileInput` in the HTML
+      # 
+      # 
+      # const input = document.getElementById('fileInput');
+      # 
+      # const file = input.files[0];
+      # 
+      # const upload = new tus.Upload(file, {
+      #   endpoint: tusEndpoint, // URL from `tusEndpoint` field in the
+      # `/request-upload` response
+      #   metadata: {
+      #     filename,
+      #     filetype: 'video/mp4',
+      #   },
+      #   uploadSize: file.size,
+      #   onError(err) {
+      #     console.error('Error uploading file:', err);
+      #   },
+      #   onProgress(bytesUploaded, bytesTotal) {
+      #     const percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(2);
+      #     console.log('Uploaded ' + percentage + '%');
+      #   },
+      #   onSuccess() {
+      #     console.log('Upload finished:', upload.url);
+      #   },
+      # });
+      # 
+      # const previousUploads = await upload.findPreviousUploads();
+      # 
+      # if (previousUploads.length > 0) {
+      #   upload.resumeFromPreviousUpload(previousUploads[0]);
+      # }
+      # 
+      # upload.start();
+      # 
+      # ```
+      # 
+      # > Note: If you are using tus from node.js, you need to add a custom URL
+      # storage to enable resuming from previous uploads. On the browser, this
+      # is enabled by default using local storage. In node.js, add urlStorage:
+      # new tus.FileUrlStorage("path/to/tmp/file"), to the UploadFile object
+      # definition above.
+      # 
       url, params = @sdk_configuration.get_server_details
       base_url = Utils.template_url(url, params)
       url = "#{base_url}/asset/request-upload"
@@ -78,8 +150,8 @@ module Livepeer
       )
       if r.status == 200
         if Utils.match_content_type(content_type, 'application/json')
-          out = Utils.unmarshal_complex(r.env.response_body, Operations::RequestUploadData)
-          res.data = out
+          out = Utils.unmarshal_complex(r.env.response_body, Operations::RequestUploadResponseBody)
+          res.object = out
         end
       end
       res
@@ -117,8 +189,8 @@ module Livepeer
       )
       if r.status == 200
         if Utils.match_content_type(content_type, 'application/json')
-          out = Utils.unmarshal_complex(r.env.response_body, Operations::UploadAssetViaURLData)
-          res.data = out
+          out = Utils.unmarshal_complex(r.env.response_body, Operations::UploadAssetViaURLResponseBody)
+          res.object = out
         end
       end
       res
@@ -198,8 +270,8 @@ module Livepeer
 
     sig { params(asset_id: String, asset_patch_payload: Shared::AssetPatchPayload).returns(Utils::FieldAugmented) }
     def update(asset_id, asset_patch_payload)
-      # update - Update an asset
-      request = Operations::PatchAssetAssetIdRequest.new(
+      # update - Patch an asset
+      request = Operations::UpdateAssetRequest.new(
         
         asset_id: asset_id,
         asset_patch_payload: asset_patch_payload
@@ -207,7 +279,7 @@ module Livepeer
       url, params = @sdk_configuration.get_server_details
       base_url = Utils.template_url(url, params)
       url = Utils.generate_url(
-        Operations::PatchAssetAssetIdRequest,
+        Operations::UpdateAssetRequest,
         base_url,
         '/asset/{assetId}',
         request
@@ -233,7 +305,7 @@ module Livepeer
 
       content_type = r.headers.fetch('Content-Type', 'application/octet-stream')
 
-      res = Operations::PatchAssetAssetIdResponse.new(
+      res = Operations::UpdateAssetResponse.new(
         status_code: r.status, content_type: content_type, raw_response: r
       )
       if r.status == 200

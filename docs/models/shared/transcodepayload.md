@@ -1,0 +1,14 @@
+# TranscodePayload
+
+
+## Fields
+
+| Field                                                                         | Type                                                                          | Required                                                                      | Description                                                                   |
+| ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `input`                                                                       | *Object*                                                                      | :heavy_check_mark:                                                            | N/A                                                                           |
+| `storage`                                                                     | *Object*                                                                      | :heavy_check_mark:                                                            | N/A                                                                           |
+| `outputs`                                                                     | [Shared::Outputs](../../models/shared/outputs.md)                             | :heavy_check_mark:                                                            | Output formats                                                                |
+| `profiles`                                                                    | T::Array<[Shared::TranscodeProfile](../../models/shared/transcodeprofile.md)> | :heavy_minus_sign:                                                            | N/A                                                                           |
+| `target_segment_size_secs`                                                    | *T.nilable(Float)*                                                            | :heavy_minus_sign:                                                            | How many seconds the duration of each output segment should be                |
+| `creator_id`                                                                  | *T.nilable(Object)*                                                           | :heavy_minus_sign:                                                            | N/A                                                                           |
+| `c2pa`                                                                        | *T.nilable(T::Boolean)*                                                       | :heavy_minus_sign:                                                            | Decides if the output video should include C2PA signature                     |

@@ -24,7 +24,7 @@ module Livepeer
 
 
       field :name, String, { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('name') } }
-      # Timestamp (in milliseconds) at which the stream object was created
+      # Timestamp (in milliseconds) at which stream object was created
       field :created_at, T.nilable(Float), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('createdAt') } }
 
       field :id, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('id') } }
@@ -42,9 +42,9 @@ module Livepeer
       field :mp4_url, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('mp4Url') } }
       # Rate at which transcodedBytes increases (bytes/second)
       field :outgoing_rate, T.nilable(Float), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('outgoingRate') } }
-      # Points to the parent stream object
+      # Points to parent stream object
       field :parent_id, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('parentId') } }
-      # Used to form the playback URL
+      # Used to form playback URL
       field :playback_id, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('playbackId') } }
 
       field :profiles, T.nilable(T::Array[Shared::FfmpegProfile]), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('profiles') } }

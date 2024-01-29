@@ -81,16 +81,16 @@ module Livepeer
       # HTTP response status code for this operation
       field :status_code, Integer
       # A list of Metric objects
-      field :data, T.nilable(T::Array[Shared::ViewershipMetric])
+      field :classes, T.nilable(T::Array[Shared::ViewershipMetric])
       # Raw HTTP response; suitable for custom response parsing
       field :raw_response, T.nilable(Faraday::Response)
 
 
-      sig { params(content_type: String, status_code: Integer, data: T.nilable(T::Array[Shared::ViewershipMetric]), raw_response: T.nilable(Faraday::Response)).void }
-      def initialize(content_type: nil, status_code: nil, data: nil, raw_response: nil)
+      sig { params(content_type: String, status_code: Integer, classes: T.nilable(T::Array[Shared::ViewershipMetric]), raw_response: T.nilable(Faraday::Response)).void }
+      def initialize(content_type: nil, status_code: nil, classes: nil, raw_response: nil)
         @content_type = content_type
         @status_code = status_code
-        @data = data
+        @classes = classes
         @raw_response = raw_response
       end
     end

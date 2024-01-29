@@ -120,3 +120,10 @@ end
 ### [Playback](docs/sdks/playback/README.md)
 
 - [get](docs/sdks/playback/README.md#get) - Retrieve Playback Info
+
+<!-- No SDK Installation -->
+<!-- No SDK Example Usage -->
+<!-- No SDK Available Operations -->
+<!-- Placeholder for Future Speakeasy SDK Sections -->
+
+

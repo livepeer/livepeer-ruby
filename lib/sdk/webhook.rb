@@ -40,7 +40,7 @@ module Livepeer
       if r.status == 200
         if Utils.match_content_type(content_type, 'application/json')
           out = Utils.unmarshal_complex(r.env.response_body, T::Array[Shared::Webhook])
-          res.data = out
+          res.classes = out
         end
       end
       res
@@ -49,6 +49,8 @@ module Livepeer
     sig { returns(Utils::FieldAugmented) }
     def create
       # create - Create a webhook
+      # To create a new webhook, you need to make an API call with the events you want to listen for and the URL that will be called when those events occur.
+      # 
       url, params = @sdk_configuration.get_server_details
       base_url = Utils.template_url(url, params)
       url = "#{base_url}/webhook"

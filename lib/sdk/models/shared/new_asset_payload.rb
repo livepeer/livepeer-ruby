@@ -48,6 +48,8 @@ module Livepeer
       # custom name or title
       # 
       field :name, String, { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('name') } }
+      # Decides if the output video should include C2PA signature
+      field :c2pa, T.nilable(T::Boolean), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('c2pa') } }
 
       field :creator_id, T.nilable(Object), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('creatorId') } }
 
@@ -59,14 +61,17 @@ module Livepeer
 
       field :storage, T.nilable(Shared::NewAssetPayloadStorage), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('storage') } }
       # URL where the asset contents can be retrieved. Only allowed (and
-      # also required) in the upload asset via URL endpoint.
+      # also required) in the upload asset via URL endpoint. For an IPFS
+      # source, this should be similar to: `ipfs://{CID}`. For an Arweave
+      # source: `ar://{CID}`.
       # 
       field :url, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('url') } }
 
 
-      sig { params(name: String, creator_id: T.nilable(Object), encryption: T.nilable(Shared::NewAssetPayloadEncryption), playback_policy: T.nilable(Shared::PlaybackPolicy), static_mp4: T.nilable(T::Boolean), storage: T.nilable(Shared::NewAssetPayloadStorage), url: T.nilable(String)).void }
-      def initialize(name: nil, creator_id: nil, encryption: nil, playback_policy: nil, static_mp4: nil, storage: nil, url: nil)
+      sig { params(name: String, c2pa: T.nilable(T::Boolean), creator_id: T.nilable(Object), encryption: T.nilable(Shared::NewAssetPayloadEncryption), playback_policy: T.nilable(Shared::PlaybackPolicy), static_mp4: T.nilable(T::Boolean), storage: T.nilable(Shared::NewAssetPayloadStorage), url: T.nilable(String)).void }
+      def initialize(name: nil, c2pa: nil, creator_id: nil, encryption: nil, playback_policy: nil, static_mp4: nil, storage: nil, url: nil)
         @name = name
+        @c2pa = c2pa
         @creator_id = creator_id
         @encryption = encryption
         @playback_policy = playback_policy

@@ -12,7 +12,7 @@ module Livepeer
     class GetStreamsRequest < Livepeer::Utils::FieldAugmented
       extend T::Sig
 
-      # Filter the API response and retrieve a specific subset of stream objects based on certain criteria
+
       field :streamsonly, T.nilable(String), { 'query_param': { 'field_name': 'streamsonly', 'style': 'form', 'explode': true } }
 
 
@@ -31,16 +31,16 @@ module Livepeer
       # HTTP response status code for this operation
       field :status_code, Integer
       # Success
-      field :data, T.nilable(T::Array[Shared::Stream])
+      field :classes, T.nilable(T::Array[Shared::Stream])
       # Raw HTTP response; suitable for custom response parsing
       field :raw_response, T.nilable(Faraday::Response)
 
 
-      sig { params(content_type: String, status_code: Integer, data: T.nilable(T::Array[Shared::Stream]), raw_response: T.nilable(Faraday::Response)).void }
-      def initialize(content_type: nil, status_code: nil, data: nil, raw_response: nil)
+      sig { params(content_type: String, status_code: Integer, classes: T.nilable(T::Array[Shared::Stream]), raw_response: T.nilable(Faraday::Response)).void }
+      def initialize(content_type: nil, status_code: nil, classes: nil, raw_response: nil)
         @content_type = content_type
         @status_code = status_code
-        @data = data
+        @classes = classes
         @raw_response = raw_response
       end
     end

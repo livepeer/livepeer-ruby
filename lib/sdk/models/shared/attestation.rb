@@ -103,23 +103,17 @@ module Livepeer
     class AttestationIpfs < Livepeer::Utils::FieldAugmented
       extend T::Sig
 
-      # CID of the file on IPFS
-      field :cid, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('cid') } }
-      # URL to access file via HTTP through an IPFS gateway
-      field :gateway_url, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('gatewayUrl') } }
+
+      field :dollar_ref, T.nilable(Object), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('$ref') } }
       # Timestamp (in milliseconds) at which IPFS export task was updated
       # 
       field :updated_at, T.nilable(Float), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('updatedAt') } }
-      # URL with IPFS scheme for the file
-      field :url, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('url') } }
 
 
-      sig { params(cid: T.nilable(String), gateway_url: T.nilable(String), updated_at: T.nilable(Float), url: T.nilable(String)).void }
-      def initialize(cid: nil, gateway_url: nil, updated_at: nil, url: nil)
-        @cid = cid
-        @gateway_url = gateway_url
+      sig { params(dollar_ref: T.nilable(Object), updated_at: T.nilable(Float)).void }
+      def initialize(dollar_ref: nil, updated_at: nil)
+        @dollar_ref = dollar_ref
         @updated_at = updated_at
-        @url = url
       end
     end
 

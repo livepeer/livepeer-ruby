@@ -40,7 +40,7 @@ module Livepeer
       if r.status == 200
         if Utils.match_content_type(content_type, 'application/json')
           out = Utils.unmarshal_complex(r.env.response_body, T::Array[Shared::MultistreamTarget])
-          res.data = out
+          res.classes = out
         end
       end
       res
@@ -88,6 +88,9 @@ module Livepeer
     sig { params(id: String).returns(Utils::FieldAugmented) }
     def delete(id)
       # delete - Delete a multistream target
+      # Make sure to remove any references to the target on existing
+      # streams before actually deleting it from the API.
+      # 
       request = Operations::DeleteMultistreamTargetRequest.new(
         
         id: id

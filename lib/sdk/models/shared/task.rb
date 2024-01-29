@@ -7,8 +7,6 @@ require 'sorbet-runtime'
 require 'faraday'
 require_relative '../shared/encryption'
 require_relative '../shared/ipfs_export_params'
-require_relative '../shared/ffmpeg_profile'
-require_relative '../shared/upload'
 
 module Livepeer
   module Shared
@@ -16,10 +14,8 @@ module Livepeer
     class TaskType < T::Enum
       enums do
         UPLOAD = new('upload')
-        IMPORT = new('import')
         EXPORT = new('export')
         EXPORT_DATA = new('export-data')
-        TRANSCODE = new('transcode')
         TRANSCODE_FILE = new('transcode-file')
         CLIP = new('clip')
       end
@@ -27,23 +23,21 @@ module Livepeer
 
 
     # Parameters for the upload task
-    class TaskUploadOutput < Livepeer::Utils::FieldAugmented
+    class Upload < Livepeer::Utils::FieldAugmented
       extend T::Sig
 
+      # Decides if the output video should include C2PA signature
+      field :c2pa, T.nilable(T::Boolean), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('c2pa') } }
 
-      field :encryption, T.nilable(Shared::EncryptionOutput), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('encryption') } }
-      # ID of the original recorded session to avoid re-transcoding
-      # of the same content. Only used for import task.
-      # 
-      field :recorded_session_id, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('recordedSessionId') } }
+      field :encryption, T.nilable(Shared::Encryption), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('encryption') } }
       # URL of the asset to "upload"
       field :url, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('url') } }
 
 
-      sig { params(encryption: T.nilable(Shared::EncryptionOutput), recorded_session_id: T.nilable(String), url: T.nilable(String)).void }
-      def initialize(encryption: nil, recorded_session_id: nil, url: nil)
+      sig { params(c2pa: T.nilable(T::Boolean), encryption: T.nilable(Shared::Encryption), url: T.nilable(String)).void }
+      def initialize(c2pa: nil, encryption: nil, url: nil)
+        @c2pa = c2pa
         @encryption = encryption
-        @recorded_session_id = recorded_session_id
         @url = url
       end
     end
@@ -81,20 +75,6 @@ module Livepeer
       end
     end
 
-    # Parameters for the transcode task
-    class Transcode < Livepeer::Utils::FieldAugmented
-      extend T::Sig
-
-      # LMPS ffmpeg profile
-      field :profile, T.nilable(Shared::FfmpegProfile), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('profile') } }
-
-
-      sig { params(profile: T.nilable(Shared::FfmpegProfile)).void }
-      def initialize(profile: nil)
-        @profile = profile
-      end
-    end
-
     # Input video file to transcode
     class Input < Livepeer::Utils::FieldAugmented
       extend T::Sig
@@ -128,7 +108,7 @@ module Livepeer
     end
 
     # HLS output format
-    class Hls < Livepeer::Utils::FieldAugmented
+    class TaskHls < Livepeer::Utils::FieldAugmented
       extend T::Sig
 
       # Path for the HLS output
@@ -142,7 +122,7 @@ module Livepeer
     end
 
     # MP4 output format
-    class Mp4 < Livepeer::Utils::FieldAugmented
+    class TaskMp4 < Livepeer::Utils::FieldAugmented
       extend T::Sig
 
       # Path for the MP4 output
@@ -156,16 +136,16 @@ module Livepeer
     end
 
     # Output formats
-    class Outputs < Livepeer::Utils::FieldAugmented
+    class TaskOutputs < Livepeer::Utils::FieldAugmented
       extend T::Sig
 
       # HLS output format
-      field :hls, T.nilable(Shared::Hls), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('hls') } }
+      field :hls, T.nilable(Shared::TaskHls), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('hls') } }
       # MP4 output format
-      field :mp4, T.nilable(Shared::Mp4), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('mp4') } }
+      field :mp4, T.nilable(Shared::TaskMp4), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('mp4') } }
 
 
-      sig { params(hls: T.nilable(Shared::Hls), mp4: T.nilable(Shared::Mp4)).void }
+      sig { params(hls: T.nilable(Shared::TaskHls), mp4: T.nilable(Shared::TaskMp4)).void }
       def initialize(hls: nil, mp4: nil)
         @hls = hls
         @mp4 = mp4
@@ -176,14 +156,16 @@ module Livepeer
     class TranscodeFile < Livepeer::Utils::FieldAugmented
       extend T::Sig
 
+      # Decides if the output video should include C2PA signature
+      field :c2pa, T.nilable(T::Boolean), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('c2pa') } }
 
       field :creator_id, T.nilable(Object), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('creatorId') } }
       # Input video file to transcode
       field :input, T.nilable(Shared::Input), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('input') } }
       # Output formats
-      field :outputs, T.nilable(Shared::Outputs), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('outputs') } }
+      field :outputs, T.nilable(Shared::TaskOutputs), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('outputs') } }
 
-      field :profiles, T.nilable(T::Array[Shared::FfmpegProfile]), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('profiles') } }
+      field :profiles, T.nilable(T::Array[Shared::TranscodeProfile]), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('profiles') } }
       # Storage for the output files
       field :storage, T.nilable(Shared::TaskStorage), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('storage') } }
       # How many seconds the duration of each output segment should
@@ -192,43 +174,15 @@ module Livepeer
       field :target_segment_size_secs, T.nilable(Float), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('targetSegmentSizeSecs') } }
 
 
-      sig { params(creator_id: T.nilable(Object), input: T.nilable(Shared::Input), outputs: T.nilable(Shared::Outputs), profiles: T.nilable(T::Array[Shared::FfmpegProfile]), storage: T.nilable(Shared::TaskStorage), target_segment_size_secs: T.nilable(Float)).void }
-      def initialize(creator_id: nil, input: nil, outputs: nil, profiles: nil, storage: nil, target_segment_size_secs: nil)
+      sig { params(c2pa: T.nilable(T::Boolean), creator_id: T.nilable(Object), input: T.nilable(Shared::Input), outputs: T.nilable(Shared::TaskOutputs), profiles: T.nilable(T::Array[Shared::TranscodeProfile]), storage: T.nilable(Shared::TaskStorage), target_segment_size_secs: T.nilable(Float)).void }
+      def initialize(c2pa: nil, creator_id: nil, input: nil, outputs: nil, profiles: nil, storage: nil, target_segment_size_secs: nil)
+        @c2pa = c2pa
         @creator_id = creator_id
         @input = input
         @outputs = outputs
         @profiles = profiles
         @storage = storage
         @target_segment_size_secs = target_segment_size_secs
-      end
-    end
-
-    # Parameters of the task
-    class TaskParams < Livepeer::Utils::FieldAugmented
-      extend T::Sig
-
-      # Parameters for the export task
-      field :export, T.nilable(Object), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('export') } }
-      # Parameters for the export-data task
-      field :export_data, T.nilable(Shared::ExportData), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('exportData') } }
-      # Parameters for the upload task
-      field :import, T.nilable(Shared::UploadOutput), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('import') } }
-      # Parameters for the transcode task
-      field :transcode, T.nilable(Shared::Transcode), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('transcode') } }
-      # Parameters for the transcode-file task
-      field :transcode_file, T.nilable(Shared::TranscodeFile), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('transcode-file') } }
-      # Parameters for the upload task
-      field :upload, T.nilable(Shared::TaskUploadOutput), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('upload') } }
-
-
-      sig { params(export: T.nilable(Object), export_data: T.nilable(Shared::ExportData), import: T.nilable(Shared::UploadOutput), transcode: T.nilable(Shared::Transcode), transcode_file: T.nilable(Shared::TranscodeFile), upload: T.nilable(Shared::TaskUploadOutput)).void }
-      def initialize(export: nil, export_data: nil, import: nil, transcode: nil, transcode_file: nil, upload: nil)
-        @export = export
-        @export_data = export_data
-        @import = import
-        @transcode = transcode
-        @transcode_file = transcode_file
-        @upload = upload
       end
     end
 
@@ -288,6 +242,32 @@ module Livepeer
         @input_id = input_id
         @session_id = session_id
         @url = url
+      end
+    end
+
+    # Parameters of the task
+    class Params < Livepeer::Utils::FieldAugmented
+      extend T::Sig
+
+
+      field :clip, T.nilable(Shared::Clip), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('clip') } }
+      # Parameters for the export task
+      field :export, T.nilable(Object), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('export') } }
+      # Parameters for the export-data task
+      field :export_data, T.nilable(Shared::ExportData), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('exportData') } }
+      # Parameters for the transcode-file task
+      field :transcode_file, T.nilable(Shared::TranscodeFile), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('transcode-file') } }
+      # Parameters for the upload task
+      field :upload, T.nilable(Shared::Upload), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('upload') } }
+
+
+      sig { params(clip: T.nilable(Shared::Clip), export: T.nilable(Object), export_data: T.nilable(Shared::ExportData), transcode_file: T.nilable(Shared::TranscodeFile), upload: T.nilable(Shared::Upload)).void }
+      def initialize(clip: nil, export: nil, export_data: nil, transcode_file: nil, upload: nil)
+        @clip = clip
+        @export = export
+        @export_data = export_data
+        @transcode_file = transcode_file
+        @upload = upload
       end
     end
 
@@ -403,20 +383,6 @@ module Livepeer
       end
     end
 
-
-    class TaskTranscode < Livepeer::Utils::FieldAugmented
-      extend T::Sig
-
-
-      field :asset, T.nilable(T::Hash[Symbol, Object]), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('asset') } }
-
-
-      sig { params(asset: T.nilable(T::Hash[Symbol, Object])).void }
-      def initialize(asset: nil)
-        @asset = asset
-      end
-    end
-
     # Output of the task
     class Output < Livepeer::Utils::FieldAugmented
       extend T::Sig
@@ -426,19 +392,13 @@ module Livepeer
       # Output of the export data task
       field :export_data, T.nilable(Shared::TaskExportData), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('exportData') } }
       # Output of the upload task
-      field :import, T.nilable(T::Hash[Symbol, Object]), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('import') } }
-
-      field :transcode, T.nilable(Shared::TaskTranscode), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('transcode') } }
-      # Output of the upload task
       field :upload, T.nilable(T::Hash[Symbol, Object]), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('upload') } }
 
 
-      sig { params(export: T.nilable(Shared::Export), export_data: T.nilable(Shared::TaskExportData), import: T.nilable(T::Hash[Symbol, Object]), transcode: T.nilable(Shared::TaskTranscode), upload: T.nilable(T::Hash[Symbol, Object])).void }
-      def initialize(export: nil, export_data: nil, import: nil, transcode: nil, upload: nil)
+      sig { params(export: T.nilable(Shared::Export), export_data: T.nilable(Shared::TaskExportData), upload: T.nilable(T::Hash[Symbol, Object])).void }
+      def initialize(export: nil, export_data: nil, upload: nil)
         @export = export
         @export_data = export_data
-        @import = import
-        @transcode = transcode
         @upload = upload
       end
     end
@@ -447,8 +407,6 @@ module Livepeer
     class Task < Livepeer::Utils::FieldAugmented
       extend T::Sig
 
-
-      field :clip, T.nilable(Shared::Clip), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('clip') } }
       # Timestamp (in milliseconds) at which task was created
       field :created_at, T.nilable(Float), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('createdAt') } }
       # Task ID
@@ -460,7 +418,9 @@ module Livepeer
       # ID of the output asset
       field :output_asset_id, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('outputAssetId') } }
       # Parameters of the task
-      field :params, T.nilable(Shared::TaskParams), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('params') } }
+      field :params, T.nilable(Shared::Params), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('params') } }
+      # ID of the requester hash(IP + SALT + PlaybackId)
+      field :requester_id, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('requesterId') } }
       # Timestamp (in milliseconds) at which the task was scheduled for
       # execution (e.g. after file upload finished).
       # 
@@ -471,154 +431,17 @@ module Livepeer
       field :type, T.nilable(Shared::TaskType), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('type'), 'decoder': Utils.enum_from_string(Shared::TaskType, true) } }
 
 
-      sig { params(clip: T.nilable(Shared::Clip), created_at: T.nilable(Float), id: T.nilable(String), input_asset_id: T.nilable(String), output: T.nilable(Shared::Output), output_asset_id: T.nilable(String), params: T.nilable(Shared::TaskParams), scheduled_at: T.nilable(Float), status: T.nilable(Shared::TaskStatus), type: T.nilable(Shared::TaskType)).void }
-      def initialize(clip: nil, created_at: nil, id: nil, input_asset_id: nil, output: nil, output_asset_id: nil, params: nil, scheduled_at: nil, status: nil, type: nil)
-        @clip = clip
+      sig { params(created_at: T.nilable(Float), id: T.nilable(String), input_asset_id: T.nilable(String), output: T.nilable(Shared::Output), output_asset_id: T.nilable(String), params: T.nilable(Shared::Params), requester_id: T.nilable(String), scheduled_at: T.nilable(Float), status: T.nilable(Shared::TaskStatus), type: T.nilable(Shared::TaskType)).void }
+      def initialize(created_at: nil, id: nil, input_asset_id: nil, output: nil, output_asset_id: nil, params: nil, requester_id: nil, scheduled_at: nil, status: nil, type: nil)
         @created_at = created_at
         @id = id
         @input_asset_id = input_asset_id
         @output = output
         @output_asset_id = output_asset_id
         @params = params
+        @requester_id = requester_id
         @scheduled_at = scheduled_at
         @status = status
-        @type = type
-      end
-    end
-
-    # Parameters for the upload task
-    class TaskUpload < Livepeer::Utils::FieldAugmented
-      extend T::Sig
-
-
-      field :encryption, T.nilable(Shared::Encryption), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('encryption') } }
-      # ID of the original recorded session to avoid re-transcoding
-      # of the same content. Only used for import task.
-      # 
-      field :recorded_session_id, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('recordedSessionId') } }
-      # URL of the asset to "upload"
-      field :url, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('url') } }
-
-
-      sig { params(encryption: T.nilable(Shared::Encryption), recorded_session_id: T.nilable(String), url: T.nilable(String)).void }
-      def initialize(encryption: nil, recorded_session_id: nil, url: nil)
-        @encryption = encryption
-        @recorded_session_id = recorded_session_id
-        @url = url
-      end
-    end
-
-    # Parameters of the task
-    class Params < Livepeer::Utils::FieldAugmented
-      extend T::Sig
-
-      # Parameters for the export task
-      field :export, T.nilable(Object), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('export') } }
-      # Parameters for the export-data task
-      field :export_data, T.nilable(Shared::ExportData), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('exportData') } }
-      # Parameters for the upload task
-      field :import, T.nilable(Shared::Upload), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('import') } }
-      # Parameters for the transcode task
-      field :transcode, T.nilable(Shared::Transcode), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('transcode') } }
-      # Parameters for the transcode-file task
-      field :transcode_file, T.nilable(Shared::TranscodeFile), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('transcode-file') } }
-      # Parameters for the upload task
-      field :upload, T.nilable(Shared::TaskUpload), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('upload') } }
-
-
-      sig { params(export: T.nilable(Object), export_data: T.nilable(Shared::ExportData), import: T.nilable(Shared::Upload), transcode: T.nilable(Shared::Transcode), transcode_file: T.nilable(Shared::TranscodeFile), upload: T.nilable(Shared::TaskUpload)).void }
-      def initialize(export: nil, export_data: nil, import: nil, transcode: nil, transcode_file: nil, upload: nil)
-        @export = export
-        @export_data = export_data
-        @import = import
-        @transcode = transcode
-        @transcode_file = transcode_file
-        @upload = upload
-      end
-    end
-
-
-    class TaskIpfsInput < Livepeer::Utils::FieldAugmented
-      extend T::Sig
-
-      # IPFS CID of the exported video file
-      field :video_file_cid, String, { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('videoFileCid') } }
-      # IPFS CID of the default metadata exported for the video
-      field :nft_metadata_cid, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('nftMetadataCid') } }
-
-
-      sig { params(video_file_cid: String, nft_metadata_cid: T.nilable(String)).void }
-      def initialize(video_file_cid: nil, nft_metadata_cid: nil)
-        @video_file_cid = video_file_cid
-        @nft_metadata_cid = nft_metadata_cid
-      end
-    end
-
-    # Output of the export task
-    class TaskExport < Livepeer::Utils::FieldAugmented
-      extend T::Sig
-
-
-      field :ipfs, T.nilable(Shared::TaskIpfsInput), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('ipfs') } }
-
-
-      sig { params(ipfs: T.nilable(Shared::TaskIpfsInput)).void }
-      def initialize(ipfs: nil)
-        @ipfs = ipfs
-      end
-    end
-
-    # Output of the task
-    class TaskOutput < Livepeer::Utils::FieldAugmented
-      extend T::Sig
-
-      # Output of the export task
-      field :export, T.nilable(Shared::TaskExport), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('export') } }
-      # Output of the export data task
-      field :export_data, T.nilable(Shared::TaskExportData), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('exportData') } }
-      # Output of the upload task
-      field :import, T.nilable(T::Hash[Symbol, Object]), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('import') } }
-
-      field :transcode, T.nilable(Shared::TaskTranscode), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('transcode') } }
-      # Output of the upload task
-      field :upload, T.nilable(T::Hash[Symbol, Object]), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('upload') } }
-
-
-      sig { params(export: T.nilable(Shared::TaskExport), export_data: T.nilable(Shared::TaskExportData), import: T.nilable(T::Hash[Symbol, Object]), transcode: T.nilable(Shared::TaskTranscode), upload: T.nilable(T::Hash[Symbol, Object])).void }
-      def initialize(export: nil, export_data: nil, import: nil, transcode: nil, upload: nil)
-        @export = export
-        @export_data = export_data
-        @import = import
-        @transcode = transcode
-        @upload = upload
-      end
-    end
-
-
-    class TaskInput < Livepeer::Utils::FieldAugmented
-      extend T::Sig
-
-
-      field :clip, T.nilable(Shared::Clip), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('clip') } }
-      # ID of the input asset
-      field :input_asset_id, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('inputAssetId') } }
-      # Output of the task
-      field :output, T.nilable(Shared::TaskOutput), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('output') } }
-      # ID of the output asset
-      field :output_asset_id, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('outputAssetId') } }
-      # Parameters of the task
-      field :params, T.nilable(Shared::Params), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('params') } }
-      # Type of the task
-      field :type, T.nilable(Shared::TaskType), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('type'), 'decoder': Utils.enum_from_string(Shared::TaskType, true) } }
-
-
-      sig { params(clip: T.nilable(Shared::Clip), input_asset_id: T.nilable(String), output: T.nilable(Shared::TaskOutput), output_asset_id: T.nilable(String), params: T.nilable(Shared::Params), type: T.nilable(Shared::TaskType)).void }
-      def initialize(clip: nil, input_asset_id: nil, output: nil, output_asset_id: nil, params: nil, type: nil)
-        @clip = clip
-        @input_asset_id = input_asset_id
-        @output = output
-        @output_asset_id = output_asset_id
-        @params = params
         @type = type
       end
     end

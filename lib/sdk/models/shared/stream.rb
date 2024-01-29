@@ -10,40 +10,16 @@ require_relative '../shared/playback_policy'
 module Livepeer
   module Shared
 
-    class StreamTargets < Livepeer::Utils::FieldAugmented
-      extend T::Sig
-
-      # Name of the transcoding profile that should be sent. Use
-      # "source" for pushing the source stream data
-      # 
-      field :profile, String, { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('profile') } }
-      # ID of the multistream target object where to push this stream
-      field :id, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('id') } }
-      # If true, the stream audio will be muted, and only silent
-      # video will be pushed to the target.
-      # 
-      field :video_only, T.nilable(T::Boolean), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('videoOnly') } }
-
-
-      sig { params(profile: String, id: T.nilable(String), video_only: T.nilable(T::Boolean)).void }
-      def initialize(profile: nil, id: nil, video_only: nil)
-        @profile = profile
-        @id = id
-        @video_only = video_only
-      end
-    end
-
-
     class StreamMultistream < Livepeer::Utils::FieldAugmented
       extend T::Sig
 
       # References to targets where this stream will be simultaneously
       # streamed to
       # 
-      field :targets, T.nilable(T::Array[Shared::StreamTargets]), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('targets') } }
+      field :targets, T.nilable(T::Array[Shared::TargetOutput]), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('targets') } }
 
 
-      sig { params(targets: T.nilable(T::Array[Shared::StreamTargets])).void }
+      sig { params(targets: T.nilable(T::Array[Shared::TargetOutput])).void }
       def initialize(targets: nil)
         @targets = targets
       end
@@ -55,7 +31,7 @@ module Livepeer
 
 
       field :name, String, { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('name') } }
-      # Timestamp (in milliseconds) at which the stream object was created
+      # Timestamp (in milliseconds) at which stream object was created
       field :created_at, T.nilable(Float), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('createdAt') } }
       # Name of the token used to create this object
       field :created_by_token_name, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('createdByTokenName') } }
@@ -79,7 +55,7 @@ module Livepeer
       field :multistream, T.nilable(Shared::StreamMultistream), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('multistream') } }
       # Rate at which transcodedBytes increases (bytes/second)
       field :outgoing_rate, T.nilable(Float), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('outgoingRate') } }
-      # Points to the parent stream object
+      # Points to parent stream object
       field :parent_id, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('parentId') } }
       # Used to form playback URL
       field :playback_id, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('playbackId') } }
@@ -97,7 +73,7 @@ module Livepeer
       field :source_segments, T.nilable(Float), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('sourceSegments') } }
       # Duration of all the source segments, sec
       field :source_segments_duration, T.nilable(Float), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('sourceSegmentsDuration') } }
-      # Used to form the RTMP ingest URL
+      # Used to form RTMP ingest URL
       field :stream_key, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('streamKey') } }
       # If currently suspended
       field :suspended, T.nilable(T::Boolean), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('suspended') } }

@@ -26,7 +26,7 @@ s.config_security(
     
 res = s.task.get_all()
 
-if ! res.data.nil?
+if ! res.classes.nil?
   # handle response
 end
 

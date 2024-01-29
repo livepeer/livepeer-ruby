@@ -7,4 +7,4 @@ HLS output format
 
 | Field                   | Type                    | Required                | Description             | Example                 |
 | ----------------------- | ----------------------- | ----------------------- | ----------------------- | ----------------------- |
-| `path`                  | *T.nilable(String)*     | :heavy_minus_sign:      | Path for the HLS output | /samplevideo/hls        |
+| `path`                  | *String*                | :heavy_check_mark:      | Path for the HLS output | /samplevideo/hls        |

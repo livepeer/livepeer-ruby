@@ -12,14 +12,10 @@ module Livepeer
     class Encryption < Livepeer::Utils::FieldAugmented
       extend T::Sig
 
-      # Encryption key used to encrypt the asset. Only writable in the upload asset endpoints and cannot be retrieved back.
-      field :encrypted_key, String, { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('encryptedKey') } }
 
 
-      sig { params(encrypted_key: String).void }
-      def initialize(encrypted_key: nil)
-        @encrypted_key = encrypted_key
-      end
+      
+      def initialize; end
     end
   end
 end

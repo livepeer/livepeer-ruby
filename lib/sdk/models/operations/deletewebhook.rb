@@ -13,7 +13,7 @@ module Livepeer
     class DeleteWebhookRequest < Livepeer::Utils::FieldAugmented
       extend T::Sig
 
-      # ID of the webhook
+
       field :id, String, { 'path_param': { 'field_name': 'id', 'style': 'simple', 'explode': false } }
 
 

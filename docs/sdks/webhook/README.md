@@ -29,7 +29,7 @@ s.config_security(
     
 res = s.webhook.get_all()
 
-if ! res.data.nil?
+if ! res.classes.nil?
   # handle response
 end
 
@@ -43,7 +43,8 @@ end
 
 ## create
 
-Create a webhook
+To create a new webhook, you need to make an API call with the events you want to listen for and the URL that will be called when those events occur.
+
 
 ### Example Usage
 
@@ -109,7 +110,7 @@ end
 
 | Parameter          | Type               | Required           | Description        |
 | ------------------ | ------------------ | ------------------ | ------------------ |
-| `id`               | *String*           | :heavy_check_mark: | ID of the webhook  |
+| `id`               | *String*           | :heavy_check_mark: | N/A                |
 
 
 ### Response
@@ -153,7 +154,7 @@ end
 
 | Parameter          | Type               | Required           | Description        |
 | ------------------ | ------------------ | ------------------ | ------------------ |
-| `id`               | *String*           | :heavy_check_mark: | ID of the webhook  |
+| `id`               | *String*           | :heavy_check_mark: | N/A                |
 
 
 ### Response
@@ -197,7 +198,7 @@ end
 
 | Parameter          | Type               | Required           | Description        |
 | ------------------ | ------------------ | ------------------ | ------------------ |
-| `id`               | *String*           | :heavy_check_mark: | ID of the webhook  |
+| `id`               | *String*           | :heavy_check_mark: | N/A                |
 
 
 ### Response

@@ -4,17 +4,17 @@ $LOAD_PATH.push File.expand_path('lib', __dir__)
 
 Gem::Specification.new do |s|
   s.name        = 'livepeer'
-  s.version     = '0.0.1'
+  s.version     = '0.0.2'
   s.platform    = Gem::Platform::RUBY
-  s.licenses    = ['MIT']
+  s.licenses    = ['Apache-2.0']
   s.summary     = ''
-  s.homepage    = 'https://github.com/livepeer/livepeer-ruby'
+  s.homepage    = 'https://github.com/speakeasy-api/openapi-generation'
   s.description = 'Ruby library for the Livepeer API.'
   s.authors     = ['Livepeer']
   s.metadata    = {
-    'homepage_uri' => 'https://docs.livepeer.org/sdks/ruby',
-    'documentation_uri' => 'https://docs.livepeer.org/sdks/ruby',
-    'source_code_uri' => 'https://github.com/livepeer/livepeer-ruby'
+    'homepage_uri' => 'https://github.com/speakeasy-api/openapi-generation',
+    'documentation_uri' => 'https://github.com/speakeasy-api/openapi-generation',
+    'source_code_uri' => 'https://github.com/speakeasy-api/openapi-generation'
   }
 
   s.files         = Dir['{lib,test}/**/*']

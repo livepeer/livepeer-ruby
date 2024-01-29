@@ -29,7 +29,7 @@ s.config_security(
     
 res = s.multistream_target.get_all()
 
-if ! res.data.nil?
+if ! res.classes.nil?
   # handle response
 end
 
@@ -61,7 +61,7 @@ s.config_security(
    
 req = Shared::MultistreamTargetInput.new(
   request=Shared::MultistreamTargetInput.new(
-    name="My Multistream Target",
+    name="string",
     url="rtmps://live.my-service.tv/channel/secretKey",
     disabled=false,
   ),
@@ -89,7 +89,9 @@ end
 
 ## delete
 
-Delete a multistream target
+Make sure to remove any references to the target on existing
+streams before actually deleting it from the API.
+
 
 ### Example Usage
 
@@ -197,13 +199,13 @@ req = Operations::UpdateMultistreamTargetRequest.new(
   path_params=Operations::UpdateMultistreamTargetRequest.new(
     id="<ID>",
     multistream_target_patch_payload=Shared::MultistreamTargetPatchPayload.new(
-      name="My Multistream Target",
+      name="string",
       url="rtmps://live.my-service.tv/channel/secretKey",
       disabled=false,
     ),
   ),
   multistream_target_patch_payload=Shared::MultistreamTargetPatchPayload.new(
-    name="My Multistream Target",
+    name="string",
     url="rtmps://live.my-service.tv/channel/secretKey",
     disabled=false,
   ),

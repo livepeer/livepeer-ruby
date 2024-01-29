@@ -20,12 +20,14 @@ module Livepeer
     end
 
 
-
+    # Hrn - Human Readable Name
     class Hrn < T::Enum
       enums do
         HLS_TS_ = new('HLS (TS)')
         MP4 = new('MP4')
         WEB_RTC_H264_ = new('WebRTC (H264)')
+        THUMBNAIL_JPEG_ = new('Thumbnail (JPEG)')
+        THUMBNAILS = new('Thumbnails')
       end
     end
 
@@ -36,6 +38,8 @@ module Livepeer
         HTML5_APPLICATION_VND_APPLE_MPEGURL = new('html5/application/vnd.apple.mpegurl')
         HTML5_VIDEO_MP4 = new('html5/video/mp4')
         HTML5_VIDEO_H264 = new('html5/video/h264')
+        IMAGE_JPEG = new('image/jpeg')
+        TEXT_VTT = new('text/vtt')
       end
     end
 
@@ -44,7 +48,7 @@ module Livepeer
     class Source < Livepeer::Utils::FieldAugmented
       extend T::Sig
 
-
+      # Human Readable Name
       field :hrn, Shared::Hrn, { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('hrn'), 'decoder': Utils.enum_from_string(Shared::Hrn, false) } }
 
       field :type, Shared::PlaybackInfoSchemasType, { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('type'), 'decoder': Utils.enum_from_string(Shared::PlaybackInfoSchemasType, false) } }
@@ -73,6 +77,45 @@ module Livepeer
     end
 
 
+    class PlaybackInfoHrn < T::Enum
+      enums do
+        HLS_TS_ = new('HLS (TS)')
+      end
+    end
+
+
+
+    class PlaybackInfoSchemasMetaType < T::Enum
+      enums do
+        HTML5_APPLICATION_VND_APPLE_MPEGURL = new('html5/application/vnd.apple.mpegurl')
+      end
+    end
+
+
+
+    class DvrPlayback < Livepeer::Utils::FieldAugmented
+      extend T::Sig
+
+
+      field :error, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('error') } }
+
+      field :hrn, T.nilable(Shared::PlaybackInfoHrn), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('hrn'), 'decoder': Utils.enum_from_string(Shared::PlaybackInfoHrn, true) } }
+
+      field :type, T.nilable(Shared::PlaybackInfoSchemasMetaType), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('type'), 'decoder': Utils.enum_from_string(Shared::PlaybackInfoSchemasMetaType, true) } }
+
+      field :url, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('url') } }
+
+
+      sig { params(error: T.nilable(String), hrn: T.nilable(Shared::PlaybackInfoHrn), type: T.nilable(Shared::PlaybackInfoSchemasMetaType), url: T.nilable(String)).void }
+      def initialize(error: nil, hrn: nil, type: nil, url: nil)
+        @error = error
+        @hrn = hrn
+        @type = type
+        @url = url
+      end
+    end
+
+
     class Meta < Livepeer::Utils::FieldAugmented
       extend T::Sig
 
@@ -81,15 +124,18 @@ module Livepeer
 
       field :attestation, T.nilable(Shared::Attestation), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('attestation') } }
 
+      field :dvr_playback, T.nilable(T::Array[Shared::DvrPlayback]), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('dvrPlayback') } }
+
       field :live, T.nilable(Float), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('live') } }
       # Whether the playback policy for a asset or stream is public or signed
       field :playback_policy, T.nilable(Shared::PlaybackPolicy), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('playbackPolicy') } }
 
 
-      sig { params(source: T::Array[Shared::Source], attestation: T.nilable(Shared::Attestation), live: T.nilable(Float), playback_policy: T.nilable(Shared::PlaybackPolicy)).void }
-      def initialize(source: nil, attestation: nil, live: nil, playback_policy: nil)
+      sig { params(source: T::Array[Shared::Source], attestation: T.nilable(Shared::Attestation), dvr_playback: T.nilable(T::Array[Shared::DvrPlayback]), live: T.nilable(Float), playback_policy: T.nilable(Shared::PlaybackPolicy)).void }
+      def initialize(source: nil, attestation: nil, dvr_playback: nil, live: nil, playback_policy: nil)
         @source = source
         @attestation = attestation
+        @dvr_playback = dvr_playback
         @live = live
         @playback_policy = playback_policy
       end

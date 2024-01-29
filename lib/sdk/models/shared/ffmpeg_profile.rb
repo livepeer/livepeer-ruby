@@ -52,10 +52,13 @@ module Livepeer
       field :gop, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('gop') } }
 
       field :profile, T.nilable(Shared::Profile), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('profile'), 'decoder': Utils.enum_from_string(Shared::Profile, true) } }
+      # Restricts the size of the output video using the constant quality feature. Increasing this value will result in a lower quality video. Note that this parameter might not work if the transcoder lacks support for it.
+      # 
+      field :quality, T.nilable(Integer), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('quality') } }
 
 
-      sig { params(bitrate: Integer, fps: Integer, height: Integer, name: String, width: Integer, encoder: T.nilable(Shared::Encoder), fps_den: T.nilable(Integer), gop: T.nilable(String), profile: T.nilable(Shared::Profile)).void }
-      def initialize(bitrate: nil, fps: nil, height: nil, name: nil, width: nil, encoder: nil, fps_den: nil, gop: nil, profile: nil)
+      sig { params(bitrate: Integer, fps: Integer, height: Integer, name: String, width: Integer, encoder: T.nilable(Shared::Encoder), fps_den: T.nilable(Integer), gop: T.nilable(String), profile: T.nilable(Shared::Profile), quality: T.nilable(Integer)).void }
+      def initialize(bitrate: nil, fps: nil, height: nil, name: nil, width: nil, encoder: nil, fps_den: nil, gop: nil, profile: nil, quality: nil)
         @bitrate = bitrate
         @fps = fps
         @height = height
@@ -65,6 +68,7 @@ module Livepeer
         @fps_den = fps_den
         @gop = gop
         @profile = profile
+        @quality = quality
       end
     end
   end

@@ -20,6 +20,8 @@ module Livepeer
     sig { params(request: T.nilable(Operations::GetViewershipsMetricsRequest)).returns(Utils::FieldAugmented) }
     def get_viewership(request)
       # get_viewership - Query viewership metrics
+      # Requires a private (non-CORS) API key to be used.
+      # 
       url, params = @sdk_configuration.get_server_details
       base_url = Utils.template_url(url, params)
       url = "#{base_url}/data/views/query"
@@ -42,7 +44,7 @@ module Livepeer
       if r.status == 200
         if Utils.match_content_type(content_type, 'application/json')
           out = Utils.unmarshal_complex(r.env.response_body, T::Array[Shared::ViewershipMetric])
-          res.data = out
+          res.classes = out
         end
       end
       res
@@ -51,6 +53,8 @@ module Livepeer
     sig { params(request: T.nilable(Operations::GetCreatorMetricsRequest)).returns(Utils::FieldAugmented) }
     def get_creator_viewership(request)
       # get_creator_viewership - Query creator viewership metrics
+      # Requires a proof of ownership to be sent in the request, which for now is just the assetId or streamId parameters (1 of those must be in the query-string).
+      # 
       url, params = @sdk_configuration.get_server_details
       base_url = Utils.template_url(url, params)
       url = "#{base_url}/data/views/query/creator"
@@ -73,7 +77,7 @@ module Livepeer
       if r.status == 200
         if Utils.match_content_type(content_type, 'application/json')
           out = Utils.unmarshal_complex(r.env.response_body, T::Array[Shared::ViewershipMetric])
-          res.data = out
+          res.classes = out
         end
       end
       res
@@ -82,6 +86,10 @@ module Livepeer
     sig { params(playback_id: String).returns(Utils::FieldAugmented) }
     def get_public_total_views(playback_id)
       # get_public_total_views - Query public total views metrics
+      # Allows querying for the public metrics for viewership about a video.
+      # This can be called from the frontend with a CORS key, or even
+      # unauthenticated.
+      # 
       request = Operations::GetPublicTotalViewsMetricsRequest.new(
         
         playback_id: playback_id
@@ -110,8 +118,8 @@ module Livepeer
       )
       if r.status == 200
         if Utils.match_content_type(content_type, 'application/json')
-          out = Utils.unmarshal_complex(r.env.response_body, Operations::GetPublicTotalViewsMetricsData)
-          res.data = out
+          out = Utils.unmarshal_complex(r.env.response_body, Operations::GetPublicTotalViewsMetricsResponseBody)
+          res.object = out
         end
       end
       res

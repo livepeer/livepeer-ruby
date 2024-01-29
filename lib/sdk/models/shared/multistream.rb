@@ -8,54 +8,6 @@ require 'faraday'
 
 module Livepeer
   module Shared
-    # Inline multistream target object. Will automatically
-    # create the target resource to be used by the created stream.
-    # 
-    class Spec < Livepeer::Utils::FieldAugmented
-      extend T::Sig
-
-      # Livepeer-compatible multistream target URL (RTMP(S) or SRT)
-      field :url, String, { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('url') } }
-
-      field :name, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('name') } }
-
-
-      sig { params(url: String, name: T.nilable(String)).void }
-      def initialize(url: nil, name: nil)
-        @url = url
-        @name = name
-      end
-    end
-
-
-    class Targets < Livepeer::Utils::FieldAugmented
-      extend T::Sig
-
-      # Name of the transcoding profile that should be sent. Use
-      # "source" for pushing the source stream data
-      # 
-      field :profile, String, { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('profile') } }
-      # ID of the multistream target object where to push this stream
-      field :id, T.nilable(String), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('id') } }
-      # Inline multistream target object. Will automatically
-      # create the target resource to be used by the created stream.
-      # 
-      field :spec, T.nilable(Shared::Spec), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('spec') } }
-      # If true, the stream audio will be muted, and only silent
-      # video will be pushed to the target.
-      # 
-      field :video_only, T.nilable(T::Boolean), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('videoOnly') } }
-
-
-      sig { params(profile: String, id: T.nilable(String), spec: T.nilable(Shared::Spec), video_only: T.nilable(T::Boolean)).void }
-      def initialize(profile: nil, id: nil, spec: nil, video_only: nil)
-        @profile = profile
-        @id = id
-        @spec = spec
-        @video_only = video_only
-      end
-    end
-
 
     class Multistream < Livepeer::Utils::FieldAugmented
       extend T::Sig
@@ -63,10 +15,10 @@ module Livepeer
       # References to targets where this stream will be simultaneously
       # streamed to
       # 
-      field :targets, T.nilable(T::Array[Shared::Targets]), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('targets') } }
+      field :targets, T.nilable(T::Array[Shared::Target]), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('targets') } }
 
 
-      sig { params(targets: T.nilable(T::Array[Shared::Targets])).void }
+      sig { params(targets: T.nilable(T::Array[Shared::Target])).void }
       def initialize(targets: nil)
         @targets = targets
       end

@@ -12,7 +12,7 @@ module Livepeer
   class SDK
     extend T::Sig
 
-    attr_accessor :stream, :multistream_target, :webhook, :asset, :metrics, :session, :access_control, :task, :transcode, :playback
+    attr_accessor :stream, :multistream_target, :webhook, :asset, :session, :metrics, :signing_key, :task, :transcode, :playback
 
     attr_accessor :security, :language, :sdk_version, :gen_version
 
@@ -78,12 +78,42 @@ module Livepeer
       @multistream_target = MultistreamTarget.new(@sdk_configuration)
       @webhook = Webhook.new(@sdk_configuration)
       @asset = Asset.new(@sdk_configuration)
-      @metrics = Metrics.new(@sdk_configuration)
       @session = Session.new(@sdk_configuration)
-      @access_control = AccessControl.new(@sdk_configuration)
+      @metrics = Metrics.new(@sdk_configuration)
+      @signing_key = SigningKey.new(@sdk_configuration)
       @task = Task.new(@sdk_configuration)
       @transcode = Transcode.new(@sdk_configuration)
       @playback = Playback.new(@sdk_configuration)
+    end
+
+    
+    sig { returns(Utils::FieldAugmented) }
+    def get_all
+      # get_all - Retrieves signing keys
+      url, params = @sdk_configuration.get_server_details
+      base_url = Utils.template_url(url, params)
+      url = "#{base_url}/access-control/signing-key"
+      headers = {}
+      headers['Accept'] = 'application/json'
+      headers['user-agent'] = @sdk_configuration.user_agent
+
+      r = @sdk_configuration.client.get(url) do |req|
+        req.headers = headers
+        Utils.configure_request_security(req, @sdk_configuration.security) if !@sdk_configuration.nil? && !@sdk_configuration.security.nil?
+      end
+
+      content_type = r.headers.fetch('Content-Type', 'application/octet-stream')
+
+      res = Operations::GetSigningKeysResponse.new(
+        status_code: r.status, content_type: content_type, raw_response: r
+      )
+      if r.status == 200
+        if Utils.match_content_type(content_type, 'application/json')
+          out = Utils.unmarshal_complex(r.env.response_body, T::Array[Shared::SigningKey])
+          res.classes = out
+        end
+      end
+      res
     end
   end
 end

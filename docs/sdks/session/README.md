@@ -3,10 +3,54 @@
 
 ### Available Operations
 
+* [get_all_clips](#get_all_clips) - Retrieve clips of a session
 * [get_all](#get_all) - Retrieve sessions
 * [get](#get) - Retrieve a session
 * [get_recorded](#get_recorded) - Retrieve Recorded Sessions
-* [get_all_clips](#get_all_clips) - Retrieve clips of a session
+
+## get_all_clips
+
+Retrieve clips of a session
+
+### Example Usage
+
+```ruby
+require_relative livepeer
+
+
+s = Livepeer::SDK.new
+s.config_security(
+  security=Shared::Security.new(
+    api_key="",
+  )
+)
+
+   
+req = Operations::GetSessionIdClipsRequest.new(
+  path_params=Operations::GetSessionIdClipsRequest.new(
+    id="<ID>",
+  ),
+)
+    
+res = s.session.get_all_clips(req)
+
+if ! res.classes.nil?
+  # handle response
+end
+
+```
+
+### Parameters
+
+| Parameter                | Type                     | Required                 | Description              |
+| ------------------------ | ------------------------ | ------------------------ | ------------------------ |
+| `id`                     | *String*                 | :heavy_check_mark:       | ID of the parent session |
+
+
+### Response
+
+**[T.nilable(Operations::GetSessionIdClipsResponse)](../../models/operations/getsessionidclipsresponse.md)**
+
 
 ## get_all
 
@@ -28,7 +72,7 @@ s.config_security(
     
 res = s.session.get_all()
 
-if ! res.data.nil?
+if ! res.classes.nil?
   # handle response
 end
 
@@ -115,7 +159,7 @@ req = Operations::GetRecordedSessionsRequest.new(
     
 res = s.session.get_recorded(req)
 
-if ! res.data.nil?
+if ! res.classes.nil?
   # handle response
 end
 
@@ -132,48 +176,4 @@ end
 ### Response
 
 **[T.nilable(Operations::GetRecordedSessionsResponse)](../../models/operations/getrecordedsessionsresponse.md)**
-
-
-## get_all_clips
-
-Retrieve clips of a session
-
-### Example Usage
-
-```ruby
-require_relative livepeer
-
-
-s = Livepeer::SDK.new
-s.config_security(
-  security=Shared::Security.new(
-    api_key="",
-  )
-)
-
-   
-req = Operations::GetSessionIdClipsRequest.new(
-  path_params=Operations::GetSessionIdClipsRequest.new(
-    id="<ID>",
-  ),
-)
-    
-res = s.session.get_all_clips(req)
-
-if ! res.data.nil?
-  # handle response
-end
-
-```
-
-### Parameters
-
-| Parameter                | Type                     | Required                 | Description              |
-| ------------------------ | ------------------------ | ------------------------ | ------------------------ |
-| `id`                     | *String*                 | :heavy_check_mark:       | ID of the parent session |
-
-
-### Response
-
-**[T.nilable(Operations::GetSessionIdClipsResponse)](../../models/operations/getsessionidclipsresponse.md)**
 

@@ -24,7 +24,7 @@ module Livepeer
     end
 
     # Success
-    class RequestUploadData < Livepeer::Utils::FieldAugmented
+    class RequestUploadResponseBody < Livepeer::Utils::FieldAugmented
       extend T::Sig
 
 
@@ -55,16 +55,16 @@ module Livepeer
       # HTTP response status code for this operation
       field :status_code, Integer
       # Success
-      field :data, T.nilable(Operations::RequestUploadData)
+      field :object, T.nilable(Operations::RequestUploadResponseBody)
       # Raw HTTP response; suitable for custom response parsing
       field :raw_response, T.nilable(Faraday::Response)
 
 
-      sig { params(content_type: String, status_code: Integer, data: T.nilable(Operations::RequestUploadData), raw_response: T.nilable(Faraday::Response)).void }
-      def initialize(content_type: nil, status_code: nil, data: nil, raw_response: nil)
+      sig { params(content_type: String, status_code: Integer, object: T.nilable(Operations::RequestUploadResponseBody), raw_response: T.nilable(Faraday::Response)).void }
+      def initialize(content_type: nil, status_code: nil, object: nil, raw_response: nil)
         @content_type = content_type
         @status_code = status_code
-        @data = data
+        @object = object
         @raw_response = raw_response
       end
     end

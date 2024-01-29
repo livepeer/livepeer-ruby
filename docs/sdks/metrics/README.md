@@ -10,7 +10,8 @@
 
 ## get_viewership
 
-Query viewership metrics
+Requires a private (non-CORS) API key to be used.
+
 
 ### Example Usage
 
@@ -43,7 +44,7 @@ req = Operations::GetViewershipsMetricsRequest.new(
     
 res = s.metrics.get_viewership(req)
 
-if ! res.data.nil?
+if ! res.classes.nil?
   # handle response
 end
 
@@ -63,7 +64,8 @@ end
 
 ## get_creator_viewership
 
-Query creator viewership metrics
+Requires a proof of ownership to be sent in the request, which for now is just the assetId or streamId parameters (1 of those must be in the query-string).
+
 
 ### Example Usage
 
@@ -95,7 +97,7 @@ req = Operations::GetCreatorMetricsRequest.new(
     
 res = s.metrics.get_creator_viewership(req)
 
-if ! res.data.nil?
+if ! res.classes.nil?
   # handle response
 end
 
@@ -115,7 +117,10 @@ end
 
 ## get_public_total_views
 
-Query public total views metrics
+Allows querying for the public metrics for viewership about a video.
+This can be called from the frontend with a CORS key, or even
+unauthenticated.
+
 
 ### Example Usage
 
@@ -139,7 +144,7 @@ req = Operations::GetPublicTotalViewsMetricsRequest.new(
     
 res = s.metrics.get_public_total_views(req)
 
-if ! res.data.nil?
+if ! res.object.nil?
   # handle response
 end
 

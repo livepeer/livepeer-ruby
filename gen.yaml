@@ -14,7 +14,7 @@ features:
     inputOutputModels: 2.82.0
     nameOverrides: 2.81.1
 ruby:
-  version: 0.0.1
+  version: 0.0.2
   author: Livepeer
   description: Ruby library for the Livepeer API.
   imports:

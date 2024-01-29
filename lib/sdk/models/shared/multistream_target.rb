@@ -12,7 +12,9 @@ module Livepeer
     class MultistreamTarget < Livepeer::Utils::FieldAugmented
       extend T::Sig
 
-      # Timestamp (in milliseconds) at which multistream target object was created
+      # Timestamp (in milliseconds) at which multistream target object was
+      # created
+      # 
       field :created_at, T.nilable(Float), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('createdAt') } }
       # If true then this multistream target will not be used for pushing
       # even if it is configured in a stream object.

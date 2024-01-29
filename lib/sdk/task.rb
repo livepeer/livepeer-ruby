@@ -40,7 +40,7 @@ module Livepeer
       if r.status == 200
         if Utils.match_content_type(content_type, 'application/json')
           out = Utils.unmarshal_complex(r.env.response_body, T::Array[Shared::Task])
-          res.data = out
+          res.classes = out
         end
       end
       res

@@ -5,7 +5,7 @@
 
 require 'sorbet-runtime'
 require 'faraday'
-require_relative '../shared/signing_key_response_payload'
+require_relative '../shared/signing_key'
 
 module Livepeer
   module Operations
@@ -20,15 +20,15 @@ module Livepeer
       # Raw HTTP response; suitable for custom response parsing
       field :raw_response, T.nilable(Faraday::Response)
       # Success
-      field :signing_key_response_payload, T.nilable(Shared::SigningKeyResponsePayload)
+      field :signing_key, T.nilable(Shared::SigningKey)
 
 
-      sig { params(content_type: String, status_code: Integer, raw_response: T.nilable(Faraday::Response), signing_key_response_payload: T.nilable(Shared::SigningKeyResponsePayload)).void }
-      def initialize(content_type: nil, status_code: nil, raw_response: nil, signing_key_response_payload: nil)
+      sig { params(content_type: String, status_code: Integer, raw_response: T.nilable(Faraday::Response), signing_key: T.nilable(Shared::SigningKey)).void }
+      def initialize(content_type: nil, status_code: nil, raw_response: nil, signing_key: nil)
         @content_type = content_type
         @status_code = status_code
         @raw_response = raw_response
-        @signing_key_response_payload = signing_key_response_payload
+        @signing_key = signing_key
       end
     end
   end

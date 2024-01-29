@@ -5,8 +5,6 @@
 
 require 'sorbet-runtime'
 require 'faraday'
-require_relative '../shared/nftmetadatatemplate'
-require_relative '../shared/nftmetadata'
 
 module Livepeer
   module Shared
@@ -14,26 +12,17 @@ module Livepeer
     class IpfsExportParams < Livepeer::Utils::FieldAugmented
       extend T::Sig
 
-      # Additional data to add to the NFT metadata exported to
-      # IPFS. Will be deep merged with the default metadata
-      # exported.
-      # 
-      field :nft_metadata, T.nilable(Shared::NftMetadata), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('nftMetadata') } }
-      # Name of the NFT metadata template to export. 'player'
-      # will embed the Livepeer Player on the NFT while 'file'
-      # will reference only the immutable MP4 files.
-      # 
-      field :nft_metadata_template, T.nilable(Shared::NftMetadataTemplate), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('nftMetadataTemplate'), 'decoder': Utils.enum_from_string(Shared::NftMetadataTemplate, true) } }
+
+      field :dollar_ref, T.nilable(Object), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('$ref') } }
       # Custom credentials for the Piñata service. Must have either
       # a JWT or an API key and an API secret.
       # 
       field :pinata, T.nilable(Object), { 'format_json': { 'letter_case': OpenApiSDK::Utils.field_name('pinata') } }
 
 
-      sig { params(nft_metadata: T.nilable(Shared::NftMetadata), nft_metadata_template: T.nilable(Shared::NftMetadataTemplate), pinata: T.nilable(Object)).void }
-      def initialize(nft_metadata: nil, nft_metadata_template: nil, pinata: nil)
-        @nft_metadata = nft_metadata
-        @nft_metadata_template = nft_metadata_template
+      sig { params(dollar_ref: T.nilable(Object), pinata: T.nilable(Object)).void }
+      def initialize(dollar_ref: nil, pinata: nil)
+        @dollar_ref = dollar_ref
         @pinata = pinata
       end
     end

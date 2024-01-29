@@ -28,7 +28,7 @@ module Livepeer
     # A simplified metric object about aggregate viewership of an
     # asset. Either playbackId or dStorageUrl will be set.
     # 
-    class GetPublicTotalViewsMetricsData < Livepeer::Utils::FieldAugmented
+    class GetPublicTotalViewsMetricsResponseBody < Livepeer::Utils::FieldAugmented
       extend T::Sig
 
       # The total playtime in minutes for the asset
@@ -59,16 +59,16 @@ module Livepeer
       # HTTP response status code for this operation
       field :status_code, Integer
       # A single Metric object with the viewCount and playtimeMins metrics.
-      field :data, T.nilable(Operations::GetPublicTotalViewsMetricsData)
+      field :object, T.nilable(Operations::GetPublicTotalViewsMetricsResponseBody)
       # Raw HTTP response; suitable for custom response parsing
       field :raw_response, T.nilable(Faraday::Response)
 
 
-      sig { params(content_type: String, status_code: Integer, data: T.nilable(Operations::GetPublicTotalViewsMetricsData), raw_response: T.nilable(Faraday::Response)).void }
-      def initialize(content_type: nil, status_code: nil, data: nil, raw_response: nil)
+      sig { params(content_type: String, status_code: Integer, object: T.nilable(Operations::GetPublicTotalViewsMetricsResponseBody), raw_response: T.nilable(Faraday::Response)).void }
+      def initialize(content_type: nil, status_code: nil, object: nil, raw_response: nil)
         @content_type = content_type
         @status_code = status_code
-        @data = data
+        @object = object
         @raw_response = raw_response
       end
     end
